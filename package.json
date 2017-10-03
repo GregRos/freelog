@@ -1,13 +1,21 @@
 {
   "name": "freelog",
-  "version": "0.1.0",
-  "description": "A simple, unopinionated, open-ended logging library",
-  "main": "index.js",
+  "version": "0.1.0-beta",
+  "description": "A simple, unopinionated, customizable logging library",
+  "main": "dist/lib/index.js",
   "scripts": {
-    "test": "n",
+    "test": "node ./dist/__tests__/runner.js",
     "watch": "gulp watch",
     "build": "gulp build"
   },
+  "directories": {
+    "test": "dist/__tests__",
+    "lib": "dist/lib"
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ],
   "author": "Greg Rosenbaum",
   "license": "ISC",
   "devDependencies": {
