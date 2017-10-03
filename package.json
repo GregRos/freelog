@@ -17,7 +17,7 @@
     "src/"
   ],
   "author": "Greg Rosenbaum",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/gulp": "^4.0.4",
     "@types/jasmine": "^2.6.0",
