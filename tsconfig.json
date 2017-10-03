@@ -7,12 +7,12 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "preserveConstEnums": true,
-    "removeComments": true,
+    "removeComments": false,
     "sourceMap": true,
-    "skipLibCheck": true,
     "target": "ES6",
-    "allowUnreachableCode": true
+    "lib": ["es6"],
+    "allowUnreachableCode": true,
+    "importHelpers": true
   },
-
   "exclude": [ "node_modules"]
 }

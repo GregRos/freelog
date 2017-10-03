@@ -29,12 +29,14 @@
     "gulp-clean": "^0.3.2",
     "gulp-sourcemaps": "^2.6.1",
     "gulp-typescript": "^3.2.2",
+    "istanbul": "^0.4.5",
     "jasmine": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",
     "merge2": "^1.2.0",
     "typescript": "^2.5.2"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "tslib": "^1.7.1"
   }
 }
