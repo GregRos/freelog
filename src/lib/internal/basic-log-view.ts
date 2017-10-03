@@ -1,15 +1,22 @@
 import {LogSubscription, LogView} from "../log-view";
 import * as _ from "lodash";
+import {ParameterType, Validate} from "./errors";
 
 export class CoreLogView<T> implements LogView<T> {
     private callbacks = [] as ((msg : T) => void)[];
 
-
     each(callback: ((msg: T) => void)) : LogSubscription {
-        if (!_.isFunction(callback)) throw new Error(`Parameter 'callback' must be a function, but it was: ${callback}.`);
+        Validate.paramOfType(callback, "callback", ParameterType.Function);
         this.callbacks.push(callback);
+        let alreadyUnsubbed = false;
         return {
-            close : () => _.pull(this.callbacks, callback)
+            close : () => {
+                if (!alreadyUnsubbed) {
+                    _.pull(this.callbacks, callback)
+                } else {
+                    alreadyUnsubbed = true;
+                }
+            }
         }
     }
 
@@ -18,7 +25,7 @@ export class CoreLogView<T> implements LogView<T> {
     }
 
     filterMap<S>(projection : (ev : T) => S | null) : LogView<S> {
-        if (!_.isFunction(projection)) throw new Error(`Parameter 'projection' must be a function, but it was: ${projection}.`);
+        Validate.paramOfType(projection, "projection", ParameterType.Function);
         let logView = new CoreLogView<S>();
         this.each(ev => {
             let res = projection(ev);
@@ -31,7 +38,7 @@ export class CoreLogView<T> implements LogView<T> {
     }
 
     post(ev : T) : void {
-        if (!_.isObject(ev)) throw new Error(`Parameter 'ev' must be an object, but it was: ${ev}.`);
+        Validate.paramOfType(ev, "ev", ParameterType.Object);
         this.callbacks.forEach(cb => cb(ev));
     }
 
@@ -45,6 +52,8 @@ export class CoreLogView<T> implements LogView<T> {
 
 
     group<K>(groups : K[], getKey : (msg : T) => K) : Map<K, LogView<T>> {
+        Validate.paramOfType(getKey, "getKey", ParameterType.Function);
+        Validate.paramOfType(groups, "groups", ParameterType.Array);
         if (!_.isFunction(getKey)) throw new Error(`Parameter 'getKey' must be a function, but it was: ${getKey}.`);
         if (!_.isArray(groups)) throw new Error(`Parameter 'groups' must be an array, but it was: ${groups}`);
         let logViews = new Map<K, CoreLogView<T>>();
@@ -66,7 +75,7 @@ export class CoreLogView<T> implements LogView<T> {
     }
 
     expand<S>(projection : (ev : T) => S[]) : LogView<S> {
-        if (!_.isFunction(projection)) throw new Error(`Parameter 'projection' must be a function, but it was: ${projection}.`);
+        Validate.paramOfType(projection, "projection", ParameterType.Function);
         let logView = new CoreLogView<S>();
         this.each(ev => {
             projection(ev).forEach(ev2 => logView.post(ev2));
@@ -75,21 +84,22 @@ export class CoreLogView<T> implements LogView<T> {
     }
 
     filter(predicate: (msg: T) => boolean): LogView<T> {
-        if (!_.isFunction(predicate)) throw new Error(`Parameter 'projection' must be a function, but it was: ${predicate}.`);
+        Validate.paramOfType(predicate, "predicate", ParameterType.Function);
         let impl = new CoreLogView<T>();
         this.each(ev => predicate(ev) && impl.post(ev));
         return impl;
     }
 
     map<S>(projection: (msg: T) => S): LogView<S> {
-        if (!_.isFunction(projection)) throw new Error(`Parameter 'projection' must be a function, but it was: ${projection}.`);
+        Validate.paramOfType(projection, "projection", ParameterType.Function);
         let impl = new CoreLogView<S>();
         this.each(ev => impl.post(projection(ev)));
         return impl;
     }
 
     mutateMap(action : (msg : T) => void) : LogView<T> {
-        if (!_.isFunction(action)) throw new Error(`Parameter 'action' must be a function, but it was: ${action}.`);
+        Validate.paramOfType(action, "action", ParameterType.Function);
+
         let impl = new CoreLogView<T>();
         this.each(ev => {
             let clone = _.cloneDeep(ev);

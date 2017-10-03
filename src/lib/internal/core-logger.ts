@@ -3,6 +3,7 @@ import {Logger} from "../logger";
 import {LogView} from "../log-view";
 import _ = require("lodash");
 import {CoreLogEvent, CoreLogViewEvent} from "../events";
+import {Errors, ParameterType, Validate} from "./errors";
 
 class LogViewEventImpl<T>  {
     interpolate(): this {
@@ -25,15 +26,18 @@ export class CoreLogger<T> extends CoreLogView<CoreLogEvent<T>> implements Logge
     }
 
     log(ev : CoreLogEvent<T>) {
+        Validate.paramOfType(ev, "ev", ParameterType.Object);
         if (!_.isNumber(ev.$level)) {
-            throw new Error(`Invalid log message. Given log $level = ${ev.$level}, but that's not a number.`);
+            throw Errors.levelNotNumberInMessage();
         }
         let obj = _.cloneDeep(ev) as any;
         _.forOwn(this.props, (v, k) => {
-            if (v instanceof  Function) {
-                obj[k] = v();
-            } else {
-                obj[k] = v;
+            if (!(k in obj)) {
+                if (v instanceof  Function) {
+                    obj[k] = v();
+                } else {
+                    obj[k] = v;
+                }
             }
         });
         this.post(obj);
@@ -41,9 +45,13 @@ export class CoreLogger<T> extends CoreLogView<CoreLogEvent<T>> implements Logge
     }
 
     child(props ?: object) {
-        let newProps = _.cloneDeep(this.props);
-        newProps = _.defaults(newProps, props);
-        return new ((this as any).constructor)(newProps) as this;
+        let propsClone = _.cloneDeep(this.props);
+        propsClone = _.assign(propsClone, props);
+        let newLog = new ((this as any).constructor)(propsClone) as this;
+        newLog.each(ev => {
+            this.post(ev);
+        });
+        return newLog;
     }
 
     view() : LogView<CoreLogViewEvent<T>> {
