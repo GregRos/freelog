@@ -1,0 +1,32 @@
+{
+  "name": "freelog",
+  "version": "0.1.0",
+  "description": "A simple, unopinionated, open-ended logging library",
+  "main": "index.js",
+  "scripts": {
+    "test": "n",
+    "watch": "gulp watch",
+    "build": "gulp build"
+  },
+  "author": "Greg Rosenbaum",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/gulp": "^4.0.4",
+    "@types/jasmine": "^2.6.0",
+    "@types/lodash": "^4.14.75",
+    "@types/node": "^8.0.30",
+    "del": "^3.0.0",
+    "glob": "^7.1.2",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-typescript": "^3.2.2",
+    "jasmine": "^2.8.0",
+    "jasmine-spec-reporter": "^4.2.1",
+    "merge2": "^1.2.0",
+    "typescript": "^2.5.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
