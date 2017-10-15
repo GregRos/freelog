@@ -1,6 +1,5 @@
 import {LogView} from "./log-view";
-import {LogEvent} from "./events";
-import {ExpandedLogEvent} from "./internal/core-logger";
+import {ExpandedLogEvent, LogEvent} from "./events";
 
 export interface Logger<T extends LogEvent = LogEvent>{
     props : T;

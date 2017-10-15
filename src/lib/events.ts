@@ -6,3 +6,9 @@ export interface LogEvent {
     $message : string;
     [key : string] : any;
 }
+
+export interface ExpandedLogEvent {
+    readonly $levelLabel : string;
+    $level : number;
+    $message : string;
+}

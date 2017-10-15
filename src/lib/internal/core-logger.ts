@@ -2,16 +2,11 @@ import {CoreLogView} from "./basic-log-view";
 import {Logger} from "../logger";
 import {LogView} from "../log-view";
 import _ = require("lodash");
-import {LogEvent} from "../events";
+import {ExpandedLogEvent, LogEvent} from "../events";
 import {Errors, ParameterType, Validate} from "./errors";
 import {LoggerLevels} from "../freelog";
 
 
-export interface ExpandedLogEvent {
-    readonly $levelLabel : string;
-    $level : number;
-    $message : string;
-}
 
 
 
