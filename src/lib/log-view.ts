@@ -1,13 +1,19 @@
 import _ = require("lodash");
 import {log} from "util";
-import {CoreLogViewEvent} from "./events";
+import {LogViewEvent} from "./events";
 
 export interface LogSubscription {
     close() : void;
 }
 
-export interface LogView<T = CoreLogViewEvent> {
+export interface LogView<T = LogViewEvent> {
     each(callback: (msg: T) => void): LogSubscription;
+
+    first() : Promise<T>;
+
+    take(count : number) : Promise<T[]>
+
+    skip(count : number) : LogView<T>;
 
     filter(predicate : (msg : T) => boolean) : LogView<T>;
 
@@ -22,5 +28,6 @@ export interface LogView<T = CoreLogViewEvent> {
     expand<S>(projection : (msg : T) => S[]) : LogView<S>;
 
     filterMap<S>(projection : (msg : T) => S | null) : LogView<S>;
+
 }
 

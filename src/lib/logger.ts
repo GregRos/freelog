@@ -1,8 +1,8 @@
 import {LogView} from "./log-view";
-import {CoreLogEvent, CoreLogViewEvent} from "./events";
+import {LogEvent, LogViewEvent} from "./events";
 
-export interface Logger<T>{
-    props : CoreLogEvent<T>;
-    log(ev : CoreLogEvent<T>) : this;
-    view() : LogView<CoreLogViewEvent<T>>;
+export interface Logger<T = {}>{
+    props : LogEvent<T>;
+    log(ev : LogEvent<T>) : this;
+    view() : LogView<LogViewEvent<T>>;
 }

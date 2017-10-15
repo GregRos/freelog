@@ -1,6 +1,6 @@
 {
   "name": "freelog",
-  "version": "0.1.0-beta",
+  "version": "0.1.0",
   "description": "A simple, unopinionated, customizable logging library",
   "main": "dist/lib/index.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "watch": "gulp watch",
     "build": "gulp build"
   },
+  "types": "./dist/lib/index.d.ts",
   "directories": {
     "test": "dist/__tests__",
     "lib": "dist/lib"
@@ -23,6 +24,7 @@
     "@types/jasmine": "^2.6.0",
     "@types/lodash": "^4.14.75",
     "@types/node": "^8.0.30",
+    "codecov": "^2.3.0",
     "del": "^3.0.0",
     "glob": "^7.1.2",
     "gulp": "^3.9.1",
@@ -33,10 +35,19 @@
     "jasmine": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",
     "merge2": "^1.2.0",
+    "nyc": "^11.2.1",
     "typescript": "^2.5.2"
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "tslib": "^1.7.1"
+    "string-format": "^0.5.0",
+    "tslib": "^1.7.1",
+    "yamprint": "^0.3.6"
+  },
+  "nyc": {
+    "exclude": [
+      "**/__tests__/**",
+      "**/internal/errors.*"
+    ]
   }
 }

@@ -2,8 +2,9 @@ import {CoreLogView} from "./basic-log-view";
 import {Logger} from "../logger";
 import {LogView} from "../log-view";
 import _ = require("lodash");
-import {CoreLogEvent, CoreLogViewEvent} from "../events";
+import {LogEvent, LogViewEvent} from "../events";
 import {Errors, ParameterType, Validate} from "./errors";
+import {LoggerLevels} from "../freelog";
 
 class LogViewEventImpl<T>  {
     interpolate(): this {
@@ -14,18 +15,14 @@ class LogViewEventImpl<T>  {
     $message?: string;
 }
 
-function wrapEvent<T>(ev : CoreLogEvent<T>) : CoreLogViewEvent<T> {
-    let viewEvent = new LogViewEventImpl();
-    _.assign(viewEvent, ev);
-    return viewEvent as any as CoreLogViewEvent<T>;
-}
 
-export class CoreLogger<T> extends CoreLogView<CoreLogEvent<T>> implements Logger<T> {
-    constructor(public props : T & CoreLogEvent<T>) {
+
+export class CoreLogger<T> extends CoreLogView<LogEvent<T>> implements Logger<T> {
+    constructor(public levels : LoggerLevels, public props : T & LogEvent<T>) {
         super();
     }
 
-    log(ev : CoreLogEvent<T>) {
+    log(ev : LogEvent<T>) {
         Validate.paramOfType(ev, "ev", ParameterType.Object);
         if (!_.isNumber(ev.$level)) {
             throw Errors.levelNotNumberInMessage();
@@ -54,11 +51,21 @@ export class CoreLogger<T> extends CoreLogView<CoreLogEvent<T>> implements Logge
         return newLog;
     }
 
-    view() : LogView<CoreLogViewEvent<T>> {
-        let view = new CoreLogView<CoreLogViewEvent<T>>();
+    wrapEvent<T>(ev : LogEvent<T>) : LogViewEvent<T> {
+        let viewEventImpl = new LogViewEventImpl();
+        _.assign(viewEventImpl, ev);
+        let viewEvent = viewEventImpl as any as LogViewEvent<T>;
+        viewEvent.$levelLabel = _.findKey(this.levels, v => v === ev.$level);
+        return viewEventImpl as any as LogViewEvent<T>;
+    }
+
+    view() : LogView<LogViewEvent<T>> {
+        let view = new CoreLogView<LogViewEvent<T>>();
         this.each(ev => {
-            view.post(wrapEvent(ev));
+            view.post(this.wrapEvent(ev));
         });
         return view;
     }
+
+
 }

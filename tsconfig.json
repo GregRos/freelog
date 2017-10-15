@@ -4,7 +4,6 @@
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "noImplicitAny": true,
     "noImplicitThis": true,
     "preserveConstEnums": true,
     "removeComments": false,

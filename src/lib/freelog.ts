@@ -1,11 +1,13 @@
 import {Logger} from "./logger";
 import _ = require("lodash");
 import {CoreLogger} from "./internal/core-logger";
-import {CoreLogEvent} from "./events";
+import {LogEvent} from "./events";
 import {Errors, FreelogError, ParameterType, Validate} from "./internal/errors";
 
+
+
 export interface LoggerLevels {
-    [levelName: string]: number;
+    [levelName: string] : number;
 }
 
 export interface DefaultLoggerLevels extends LoggerLevels {
@@ -40,7 +42,7 @@ export module Freelog {
             constructor(props: object) {
                 props = props == null ? {} : props;
                 Validate.paramOfType(props, "props", ParameterType.Object);
-                super(props);
+                super(levels, props);
 
                 _.forOwn(levels, (v, k) => {
                     (this as any)[k] = function (messageOrLog: string | object, maybeRemainingObject ?: object) {
@@ -70,17 +72,18 @@ export module Freelog {
         (MyLogger as any).name = logClassName;
 
         type CombinedLogger<TEvent> = Logger<TEvent> & {
-            child<TOther extends TEvent = TOther>(props ?: CoreLogEvent<TOther>): CombinedLogger<TOther>
+            child<TOther extends TEvent = TOther>(props ?: LogEvent<TOther>): CombinedLogger<TOther>
         }    & {
-            [K in keyof TLevels] : (event: CoreLogEvent<TEvent>) => void
+            [K in keyof TLevels] : (event: LogEvent<TEvent>) => void
             } & {
-            [K in keyof TLevels] : ($message: string, rest ?: CoreLogEvent<TEvent>) => void
+            [K in keyof TLevels] : ($message: string, rest ?: LogEvent<TEvent>) => void
             };
 
         return MyLogger as any as {
-            new<TEvent> (props ?: CoreLogEvent<TEvent>): CombinedLogger<TEvent>
+            new<TEvent> (props ?: LogEvent<TEvent>): CombinedLogger<TEvent>
         }
     }
+
     export function defineDefault(logClassName ?: string) {
         return defineCustom({
             trace: 0,

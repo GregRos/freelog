@@ -1,5 +1,5 @@
 import {Freelog} from "../../lib/freelog";
-import {CoreLogEvent, CoreLogViewEvent} from "../../lib/events";
+import {LogEvent, LogViewEvent} from "../../lib/events";
 import {LogView} from "../../lib/log-view";
 import {basicallyWorks, extra_matchers} from '../helpers/extra-matchers-impl';
 import {FreelogError} from "../../lib/internal/errors";
@@ -28,7 +28,7 @@ describe("basics", () => {
         });
 
         describe("not empty", () => {
-            let lastMessage : CoreLogViewEvent;
+            let lastMessage : LogViewEvent;
             let view = instance.view();
             let subParent = view.each(x => {
                 lastMessage = x;
@@ -42,6 +42,7 @@ describe("basics", () => {
                 instance.cow(msg, extras);
                 expect(lastMessage).toHave({
                     $level : 5,
+                    $levelLabel : "cow",
                     $message : msg,
                     x : 1,
                     ...extras
@@ -51,6 +52,7 @@ describe("basics", () => {
                 instance.sheep(msg, extras);
                 expect(lastMessage).toHave({
                     $level : 10,
+                    $levelLabel : "sheep",
                     $message : msg,
                     x : 1,
                     ...extras
@@ -59,6 +61,7 @@ describe("basics", () => {
             it("passes event message exactly", () => {
                 let msg = {
                     $level : 100,
+                    $levelLabel : undefined,
                     $message : "test!",
                     boo : "abc!",
                     xkcd() {
@@ -79,23 +82,27 @@ describe("basics", () => {
                 expect(lastMessage).toHave({
                     $message : undefined,
                     $level : 5,
+                    $levelLabel : "cow",
                     x : 1
                 })
             });
             it("throws on invalid level", () => {
                 expect(() => instance.cow({
-                    $level : "abc" as any
+                    $level : "abc" as any,
+                    $levelLabel : undefined,
                 }));
             });
             it("qInvoke1, override $level and x", () => {
                 instance.cow("Blah", {
                     x : 5,
-                    $level : 101
+                    $level : 101,
+                    $levelLabel : undefined
                 });
                 expect(lastMessage).toHave({
                     $level : 101,
                     x : 5,
-                    $message : "Blah"
+                    $message : "Blah",
+                    $levelLabel : undefined
                 });
             });
 
@@ -114,7 +121,8 @@ describe("basics", () => {
                        $message : "Hi",
                        $level : 5,
                        x : 6,
-                       y : -1
+                       y : -1,
+                       $levelLabel : "cow"
                    };
                    expect(lastChildMessage).toHave(exampleMessage);
                    expect(lastMessage).toHave(exampleMessage);
@@ -125,7 +133,8 @@ describe("basics", () => {
                    let exampleMessage = {
                        $message : "Hi",
                        $level : 5,
-                       x : 1
+                       x : 1,
+                       $levelLabel : "cow"
                    };
 
                    expect(lastChildMessage).not.toHave(exampleMessage);
@@ -137,7 +146,8 @@ describe("basics", () => {
                    let msg = {
                        $message : "hi!",
                        $level : 1000,
-                       y : 1000
+                       y : 1000,
+                       $levelLabel : undefined
                    };
                    child.log(msg);
                    expect(lastChildMessage).not.toHave(msg);
@@ -149,7 +159,8 @@ describe("basics", () => {
                     let msg = {
                         $message : "hi!",
                         $level : 1000,
-                        y : 1001
+                        y : 1001,
+                        $levelLabel : undefined
                     };
                     child.log(msg);
                     expect(lastChildMessage).not.toHave(msg);
@@ -240,10 +251,8 @@ describe("basics", () => {
                    $level : 2
                });
            });
+       });
 
 
-
-
-       })
     });
 });

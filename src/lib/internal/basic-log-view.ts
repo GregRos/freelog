@@ -1,24 +1,69 @@
 import {LogSubscription, LogView} from "../log-view";
 import * as _ from "lodash";
 import {ParameterType, Validate} from "./errors";
+import {LogViewEvent} from "../events";
+import {Logger} from "../logger";
 
 export class CoreLogView<T> implements LogView<T> {
-    private callbacks = [] as ((msg : T) => void)[];
+    private __callbacks = [] as ((msg : T) => void)[];
 
     each(callback: ((msg: T) => void)) : LogSubscription {
         Validate.paramOfType(callback, "callback", ParameterType.Function);
-        this.callbacks.push(callback);
+        this.__callbacks.push(callback);
         let alreadyUnsubbed = false;
         return {
             close : () => {
                 if (!alreadyUnsubbed) {
-                    _.pull(this.callbacks, callback)
+                    _.pull(this.__callbacks, callback)
                 } else {
                     alreadyUnsubbed = true;
                 }
             }
         }
     }
+
+
+    first() {
+        return new Promise<T>((resolve, reject) => {
+            let alreadyHit = false;
+            let sub = this.each(first => {
+                if (alreadyHit) return;
+                sub.close();
+                alreadyHit = true;
+                resolve(first);
+            })
+
+        });
+    }
+
+    take(size : number) {
+        if (size === 0) return Promise.resolve([]);
+        return new Promise<T[]>((resolve, reject) => {
+            let alreadyHit = false;
+            let arr = [] as T[];
+            let sub = this.each(item => {
+                if (alreadyHit) return;
+                arr.push(item);
+                if (arr.length >= size) {
+                    alreadyHit = true;
+                    sub.close();
+                    resolve(arr);
+                }
+            });
+        });
+    }
+
+    skip(size : number) : LogView<T> {
+        let logView = new CoreLogView<T>();
+        let i = -1;
+        this.each(ev => {
+            i++;
+            if (i < size) return;
+            logView.post(ev);
+        });
+        return logView as LogView<T>;
+    }
+
 
     asLogView() : LogView<T> {
         return this;
@@ -38,8 +83,7 @@ export class CoreLogView<T> implements LogView<T> {
     }
 
     post(ev : T) : void {
-        Validate.paramOfType(ev, "ev", ParameterType.Object);
-        this.callbacks.forEach(cb => cb(ev));
+        this.__callbacks.forEach(cb => cb(ev));
     }
 
     merge(...others : LogView<T>[]) : LogView<T> {
