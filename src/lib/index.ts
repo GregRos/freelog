@@ -1,4 +1,4 @@
 export {Logger} from './logger';
 export {LogView} from './log-view';
 export {LoggerLevels, Freelog} from './freelog'
-export {LogViewEvent, InterpolationOptions, LogEvent} from './events';
+export {InterpolationOptions, LogEvent} from './events';

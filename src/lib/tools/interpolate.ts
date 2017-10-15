@@ -1,5 +1,5 @@
-import {LogViewEvent} from "../events";
 import * as _ from "lodash";
+import {LogEvent} from "../events";
 const format = require('string-format');
 export interface InterpolationOptions {
     removeInterpolatedFields ?: boolean;
@@ -13,7 +13,7 @@ const defaultInterpolationOptions = {
 
 export function interpolate(options : InterpolationOptions) {
     options = _.defaults(options, defaultInterpolationOptions);
-    return <T>(ev : LogViewEvent<T>) : LogViewEvent<T> => {
+    return <T extends LogEvent>(ev : T) :T => {
         let clone = _.clone(ev);
 
         let message = clone.$message;

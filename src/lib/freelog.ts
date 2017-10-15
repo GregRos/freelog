@@ -34,7 +34,7 @@ function validateLevels(levels : {[key : string] : number}) {
 }
 
 export module Freelog {
-    export function defineCustom<TLevels extends LoggerLevels>(levels: TLevels, logClassName ?: string) {
+    export function define<TLevels extends LoggerLevels>(levels: TLevels, logClassName ?: string) {
         logClassName = logClassName || "AnonymousLogger";
         Validate.paramOfType(levels, "levels", ParameterType.Object);
         validateLevels(levels);
@@ -71,21 +71,23 @@ export module Freelog {
         });
         (MyLogger as any).name = logClassName;
 
-        type CombinedLogger<TEvent> = Logger<TEvent> & {
-            child<TOther extends TEvent = TOther>(props ?: LogEvent<TOther>): CombinedLogger<TOther>
+        type CombinedLogger<TEvent extends LogEvent> = Logger<TEvent> & {
+            child<TOther extends TEvent = TOther>(props ?: Partial<TOther>): CombinedLogger<TOther>
         }    & {
-            [K in keyof TLevels] : (event: LogEvent<TEvent>) => void
+            [K in keyof TLevels] : (event: Partial<TEvent>) => void
             } & {
-            [K in keyof TLevels] : ($message: string, rest ?: LogEvent<TEvent>) => void
+            [K in keyof TLevels] : ($message: string, rest ?: Partial<TEvent>) => void
             };
 
-        return MyLogger as any as {
-            new<TEvent> (props ?: LogEvent<TEvent>): CombinedLogger<TEvent>
+        return {
+            construct<TEvent extends LogEvent>(props ?: Partial<TEvent>) : CombinedLogger<TEvent> {
+                return new MyLogger(props) as any;
+            }
         }
     }
 
     export function defineDefault(logClassName ?: string) {
-        return defineCustom({
+        return define({
             trace: 0,
             debug: 1,
             info: 2,

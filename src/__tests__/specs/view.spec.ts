@@ -1,7 +1,6 @@
 import {extra_matchers} from "../helpers/extra-matchers-impl";
 import {Logger} from "../../lib/logger";
 import {LogView} from "../../lib/log-view";
-import {LogViewEvent} from "../../lib/events";
 import {Freelog} from "../../lib/freelog";
 import * as _ from "lodash";
 
@@ -11,7 +10,7 @@ describe("view", () => {
     });
 
     let specials = [1, 2, 3, 10, 20, 50, 100, -1, 9, 11, 3];
-    let logger = new (Freelog.defineDefault())();
+    let logger = Freelog.defineDefault().construct();
     let view = logger.view();
     let lastResults = [] as any[];
     let pushEvents = async <T, S>(v: LogView<S> | Promise<S[] | S>) => {

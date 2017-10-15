@@ -1,5 +1,5 @@
 import {Freelog} from "../../lib/freelog";
-import {LogEvent, LogViewEvent} from "../../lib/events";
+import {LogEvent} from "../../lib/events";
 import {LogView} from "../../lib/log-view";
 import {basicallyWorks, extra_matchers} from '../helpers/extra-matchers-impl';
 import {FreelogError} from "../../lib/internal/errors";
@@ -10,11 +10,11 @@ describe("basics", () => {
     });
 
     describe("create basic logger constructor", () => {
-        let constructor = Freelog.defineCustom({
+        let constructor = Freelog.define({
             cow : 5,
             sheep : 10
         });
-        let instance = new constructor({
+        let instance = constructor.construct({
             x : 1
         });
         describe("when empty", () => {
@@ -28,7 +28,7 @@ describe("basics", () => {
         });
 
         describe("not empty", () => {
-            let lastMessage : LogViewEvent;
+            let lastMessage : LogEvent;
             let view = instance.view();
             let subParent = view.each(x => {
                 lastMessage = x;
@@ -186,21 +186,21 @@ describe("basics", () => {
     describe("creation", () => {
        describe("validate define", () => {
            it("fails on invalid levels" ,() => {
-               expect(() => Freelog.defineCustom(null)).toThrowError(FreelogError)
-               expect(() => Freelog.defineCustom([1, 2, 3] as any)).toThrowError(FreelogError);
-               expect(() => Freelog.defineCustom(1 as any)).toThrowError(FreelogError);
+               expect(() => Freelog.define(null)).toThrowError(FreelogError)
+               expect(() => Freelog.define([1, 2, 3] as any)).toThrowError(FreelogError);
+               expect(() => Freelog.define(1 as any)).toThrowError(FreelogError);
 
            });
 
            it("fails on duplicate levels", () => {
-               expect(() => Freelog.defineCustom({
+               expect(() => Freelog.define({
                    a : 1,
                    b : 1
                })).toThrowError(FreelogError);
            });
 
            it("fails on non-number levels", () => {
-               expect(() => Freelog.defineCustom({
+               expect(() => Freelog.define({
                    a : "hi",
                    b : 34
                } as any)).toThrowError(FreelogError);
@@ -208,35 +208,35 @@ describe("basics", () => {
        });
 
        describe("validate construct", () => {
-           let ctor = Freelog.defineCustom({
+           let ctor = Freelog.define({
                a : 1
            });
 
            it("basically works with no props", () => {
-               let inst = new ctor();
+               let inst = ctor.construct();
                basicallyWorks(inst);
            });
 
            it("basically works with null props", () => {
-               let inst = new ctor(null);
+               let inst = ctor.construct(null);
                basicallyWorks(inst);
            });
 
            it("basically works with empty props", () => {
-               let inst = new ctor({});
+               let inst = ctor.construct({});
                basicallyWorks(inst);
            });
 
            it("error on non-object props", () => {
-               expect(() => new ctor(1 as any)).toThrowError(FreelogError);
-               expect(() => new ctor("" as any)).toThrowError(FreelogError);
-               expect(() => new ctor([1, 2, 3])).toThrowError(FreelogError);
+               expect(() => ctor.construct(1 as any)).toThrowError(FreelogError);
+               expect(() => ctor.construct("" as any)).toThrowError(FreelogError);
+               expect(() => ctor.construct([1, 2, 3])).toThrowError(FreelogError);
            });
        });
 
        describe("create default", () => {
            let ctor = Freelog.defineDefault("Test");
-           let instance = new ctor({
+           let instance = ctor.construct({
                a : 1
            });
 

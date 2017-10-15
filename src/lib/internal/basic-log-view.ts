@@ -1,7 +1,6 @@
 import {LogSubscription, LogView} from "../log-view";
 import * as _ from "lodash";
 import {ParameterType, Validate} from "./errors";
-import {LogViewEvent} from "../events";
 import {Logger} from "../logger";
 
 export class CoreLogView<T> implements LogView<T> {

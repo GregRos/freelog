@@ -1,12 +1,12 @@
 import _ = require("lodash");
 import {log} from "util";
-import {LogViewEvent} from "./events";
+import {LogEvent} from "./events";
 
 export interface LogSubscription {
     close() : void;
 }
 
-export interface LogView<T = LogViewEvent> {
+export interface LogView<T = LogEvent> {
     each(callback: (msg: T) => void): LogSubscription;
 
     first() : Promise<T>;

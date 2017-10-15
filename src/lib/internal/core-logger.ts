@@ -2,27 +2,25 @@ import {CoreLogView} from "./basic-log-view";
 import {Logger} from "../logger";
 import {LogView} from "../log-view";
 import _ = require("lodash");
-import {LogEvent, LogViewEvent} from "../events";
+import {LogEvent} from "../events";
 import {Errors, ParameterType, Validate} from "./errors";
 import {LoggerLevels} from "../freelog";
 
-class LogViewEventImpl<T>  {
-    interpolate(): this {
-        return this;
-    }
 
-    $level?: number;
-    $message?: string;
+export interface ExpandedLogEvent {
+    readonly $levelLabel : string;
+    $level : number;
+    $message : string;
 }
 
 
 
-export class CoreLogger<T> extends CoreLogView<LogEvent<T>> implements Logger<T> {
-    constructor(public levels : LoggerLevels, public props : T & LogEvent<T>) {
+export class CoreLogger<T extends LogEvent> extends CoreLogView<T> implements Logger<T> {
+    constructor(public levels : LoggerLevels, public props : T) {
         super();
     }
 
-    log(ev : LogEvent<T>) {
+    log(ev : T) {
         Validate.paramOfType(ev, "ev", ParameterType.Object);
         if (!_.isNumber(ev.$level)) {
             throw Errors.levelNotNumberInMessage();
@@ -51,18 +49,23 @@ export class CoreLogger<T> extends CoreLogView<LogEvent<T>> implements Logger<T>
         return newLog;
     }
 
-    wrapEvent<T>(ev : LogEvent<T>) : LogViewEvent<T> {
-        let viewEventImpl = new LogViewEventImpl();
+    wrapEvent(ev : T) : T & ExpandedLogEvent {
+        let self = this;
+        let viewEventImpl = {
+            get $levelLabel() {
+                return _.findKey(self.levels, v => v === ev.$level);
+            }
+        };
         _.assign(viewEventImpl, ev);
-        let viewEvent = viewEventImpl as any as LogViewEvent<T>;
-        viewEvent.$levelLabel = _.findKey(this.levels, v => v === ev.$level);
-        return viewEventImpl as any as LogViewEvent<T>;
+        let viewEvent = viewEventImpl as any;
+        return viewEventImpl as any as T & ExpandedLogEvent;
     }
 
-    view() : LogView<LogViewEvent<T>> {
-        let view = new CoreLogView<LogViewEvent<T>>();
+    view() : LogView<T & ExpandedLogEvent> {
+        let view = new CoreLogView<T & ExpandedLogEvent>();
         this.each(ev => {
             view.post(this.wrapEvent(ev));
+
         });
         return view;
     }
