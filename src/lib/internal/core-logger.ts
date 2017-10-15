@@ -16,6 +16,10 @@ export interface ExpandedLogEvent {
 
 
 export class CoreLogger<T extends LogEvent> extends CoreLogView<T> implements Logger<T> {
+
+    getLevelFromName(name: string): number {
+        return this.levels[name];
+    }
     constructor(public levels : LoggerLevels, public props : T) {
         super();
     }
