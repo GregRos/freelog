@@ -1,5 +1,4 @@
 import {LogViewEvent} from "../events";
-import {yamprint} from 'yamprint';
 import * as _ from "lodash";
 const format = require('string-format');
 export interface InterpolationOptions {
