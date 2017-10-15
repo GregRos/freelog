@@ -1,6 +1,6 @@
 {
   "name": "freelog",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A simple, unopinionated, customizable logging library",
   "main": "dist/lib/index.js",
   "scripts": {
