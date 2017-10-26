@@ -111,6 +111,7 @@ describe("basics", () => {
                    x : 6,
                    y : -1
                });
+
                let childView = child.view();
                let lastChildMessage : any;
                let subChild = childView.each(ev => lastChildMessage = ev);
