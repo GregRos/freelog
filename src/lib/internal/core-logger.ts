@@ -1,4 +1,4 @@
-import {CoreLogView} from "./basic-log-view";
+import {WriteableLogView} from "./writeable-log-view";
 import {Logger} from "../logger";
 import {LogView} from "../log-view";
 import _ = require("lodash");
@@ -10,7 +10,7 @@ import {LoggerLevels} from "../freelog";
 
 
 
-export class CoreLogger<T extends LogEvent> extends CoreLogView<T> implements Logger<T> {
+export class CoreLogger<T extends LogEvent> extends WriteableLogView<T> implements Logger<T> {
 
     getLevelFromName(name: string): number {
         return this.levels[name];
@@ -61,7 +61,7 @@ export class CoreLogger<T extends LogEvent> extends CoreLogView<T> implements Lo
     }
 
     view() : LogView<T & ExpandedLogEvent> {
-        let view = new CoreLogView<T & ExpandedLogEvent>();
+        let view = new WriteableLogView<T & ExpandedLogEvent>();
         this.each(ev => {
             view.post(this.wrapEvent(ev));
 
